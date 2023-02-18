@@ -2,6 +2,9 @@
 #include "ZParseNode.h"
 class ZListAddNode;
 
+//Dynamic expression storage.
+
+
 class ZParseListAdd : public ZParseNode
 {
 public:

@@ -213,29 +213,79 @@ int evaluateInt(std::vector<ExpressionElement> mElements) {
                         auto scls = ZScriptContext::CurrentContext->GetStaticClass(tok.mNameHash[0]);
 
                         auto gv = scls->FindVar(tok.mNameHash[1]);
-                        values.push(gv->GetIntVal());
+
+                        switch (gv->GetType()) {
+                        case VarType::VarExpr:
+                            values.push((int)gv->GetExpr()->Exec({}));
+                            break;
+                        case VarType::VarFloat:
+                            values.push((int)gv->GetFloatVal());
+                            break;
+                        case VarType::VarInteger:
+                            values.push(gv->GetIntVal());
+                            break;
+                        case VarType::VarBool:
+                            values.push(gv->GetIntVal());
+                            break;
+                        case VarType::VarVar:
+
+                            switch (gv->GetCurrentType()) {
+                            case VarInteger:
+                                values.push(gv->GetIntVal());
+                                break;
+                            case VarFloat:
+                                values.push((int)gv->GetFloatVal());
+                                break;
+                            }
+
+                            break;
+                        }
+
+                        //values.push(gv->GetIntVal());
 
                     }
                     else {
 
                         auto cls = ZScriptContext::CurrentContext->GetScope()->FindVar(tok.mNameHash[0]);
                         auto av = cls->GetClassVal()->FindVar(tok.mNameHash[1]);
-                        if (av->GetType() == VarType::VarInteger)
-                        {
 
-                            values.push(av->GetIntVal());
-                        }
-                        else if (av->GetType() == VarType::VarBool) {
-                            values.push(av->GetIntVal());
-                        }
-                        else {
+                        switch (av->GetType()) {
+                        case VarType::VarExpr:
+                            values.push((int)av->GetExpr()->Exec({}));
+                            break;
+                        case VarType::VarFloat:
                             values.push((int)av->GetFloatVal());
+                            break;
+                        case VarType::VarInteger:
+                            values.push(av->GetIntVal());
+                            break;
+                        case VarType::VarBool:
+                            values.push(av->GetIntVal());
+                            break;
+                        case VarType::VarVar:
+
+                            switch (av->GetCurrentType()) {
+                            case VarInteger:
+                                values.push(av->GetIntVal());
+                                break;
+                            case VarFloat:
+                                values.push((int)av->GetFloatVal());
+                                break;
+                            }
+
+                            break;
                         }
+
+                        //---
+                      
                     }//values.push(333);
                 }
                 else {
                     auto evar = ZScriptContext::CurrentContext->GetScope()->FindVar(tok.mNameHash[0]);
                     switch (evar->GetType()) {
+                    case VarType::VarExpr:
+                        values.push((int)evar->GetExpr()->Exec({})->GetIntVal());
+                        break;
                     case VarType::VarFloat:
                         values.push((int)evar->GetFloatVal());
                         break;
@@ -793,6 +843,10 @@ ZContextVar* Expression::Evaluate(VarType recv) {
 
 
             auto var = GetVar(mElements[0].mNameHash[0], mElements[0].mNameHash[1]);
+            if (var->GetType() == VarType::VarExpr)
+            {
+                return var->GetExpr()->Exec({});
+            }
             if (var != nullptr) {
                 return var;
             }

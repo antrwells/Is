@@ -91,6 +91,17 @@ ZScriptNode* ZParseClass::Parse()
 		}
 
 			break;
+		case TokenType::TokenExpr:
+
+			mStream->Back();
+
+			parse_vars = new ZParseVars(mStream);
+			vars_node = (ZVarsNode*)parse_vars->Parse();
+
+
+			class_node->AddVars(vars_node);
+
+			break;
 		case TokenType::TokenInt:
 		case TokenType::TokenFloat:
 	

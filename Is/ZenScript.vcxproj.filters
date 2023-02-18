@@ -356,9 +356,6 @@
     <ClCompile Include="ZenByteCode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ZAssignNode.cpp">
-      <Filter>ParseNodes</Filter>
-    </ClCompile>
     <ClCompile Include="ParseListAdd.cpp">
       <Filter>ParseNodes</Filter>
     </ClCompile>
@@ -378,6 +375,9 @@
       <Filter>ParseNodes</Filter>
     </ClCompile>
     <ClCompile Include="ZEnumNode.cpp">
+      <Filter>ScriptNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="ZAssignNode.cpp">
       <Filter>ScriptNodes</Filter>
     </ClCompile>
   </ItemGroup>

@@ -313,7 +313,7 @@ ZTokenStream* ZTokenizer::Tokenize() {
 	token_map.insert(std::make_pair("add", TokenType::TokenListAdd));
 	token_map.insert(std::make_pair("remove", TokenType::TokenListRemove));
 	token_map.insert(std::make_pair("enum", TokenType::TokenEnum));
-
+	token_map.insert(std::make_pair("expr", TokenType::TokenExpr));
 
 
 	std::vector<Token> new_tokens;

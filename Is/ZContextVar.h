@@ -5,6 +5,7 @@
 enum VarType;
 
 class ZClassNode;
+class ZExpressionNode;
 
 class ZContextVar
 {
@@ -56,7 +57,12 @@ public:
 	void SetList(std::vector<ZContextVar*> list) {
 		mList = list;
 	}
-
+	void SetExpr(ZExpressionNode* expr) {
+		mExpr = expr;
+	}
+	ZExpressionNode* GetExpr() {
+		return mExpr;
+	}
 private:
 
 	std::string mName;
@@ -76,6 +82,7 @@ private:
 	bool mComparer = false;
 	size_t mHashName;
 	std::vector<ZContextVar*> mList;
+	ZExpressionNode* mExpr = nullptr;
 
 };
 

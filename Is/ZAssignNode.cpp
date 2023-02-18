@@ -87,8 +87,15 @@ ZContextVar* ZAssignNode::Exec(const std::vector<ZContextVar*>& params)
 	case VarType::VarInstance:
 		ZExpressionNode::RecvType = VarInstance;
 		evar->SetClass(mValue->Exec({})->GetClassVal());
-		int a = 2;
+		
+		break;
+	case VarType::VarExpr:
 
+		int a = 5;
+		evar->SetExpr(mValue);
+
+
+		break;
 	}
 
 	int aa = 5;
