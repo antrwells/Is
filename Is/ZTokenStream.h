@@ -17,10 +17,17 @@ public:
 	
 	Token(enum TokenType type) {
 		mType = type;
+		mText = "";
 	}
-	Token(enum TokenType type, std::string text) {
+	Token(enum TokenType type,std::string text) {
 		mType = type;
 		mText = text;
+	}
+	Token(enum TokenType type, std::string text,int line,int chr) {
+		mType = type;
+		mText = text;
+		TokenIndex = chr;
+		TokenLineIndex = line;
 	}
 	enum TokenType mType;
 	std::string mText;

@@ -11,7 +11,7 @@ public:
 	ZSource();
 	void AddLine(std::string line);
 
-	ZSource(std::string path);
+	ZSource(std::string path,bool clean = true);
 	std::vector<std::string> GetCode();
 	void Clean();
 

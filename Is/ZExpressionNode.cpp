@@ -25,6 +25,40 @@ ZContextVar* ZExpressionNode::Exec(const std::vector<ZContextVar*>& params)
 	return nullptr;
 }
 
+
+
+ZContextVar* GetVar(size_t name1, size_t name2) {
+    ZContextVar* var = nullptr;
+
+    if (ZScriptContext::CurrentContext->IsEnum(name1)) {
+
+        auto en = ZScriptContext::CurrentContext->GetEnum(name1);
+
+        auto ri = VMakeInt(en->GetHashOptionIndex(name2));
+        return ri;
+
+        int a = 5;
+    }
+
+    if (ZScriptContext::CurrentContext->IsStaticClass(name1))
+    {
+        auto scls = ZScriptContext::CurrentContext->GetStaticClass(name1);
+        var = scls->FindVar(name2);
+
+    }
+    else {
+
+        var = ZScriptContext::CurrentContext->GetScope()->FindVar(name1);
+        if (name2 != 0)
+        {
+            auto cls = var->GetClassVal();
+            var = cls->FindVar(name2);
+        }
+
+    }
+    return var;
+}
+
 VarType ZExpressionNode::RecvType = VarType::VarVoid;
 
 int precedence(ExprOperatorType op) {
@@ -190,6 +224,38 @@ int evaluateInt(std::vector<ExpressionElement> mElements) {
             else if (tok.mType == EVar)
             {
                 int depth = 0;
+                auto var = GetVar(mElements[0].mNameHash[0], mElements[0].mNameHash[1]);
+                switch (var->GetType()) {
+                case VarType::VarExpr:
+                    values.push((int)var->GetExpr()->Exec({})->GetIntVal());
+                    break;
+                case VarType::VarFloat:
+                    values.push((int)var->GetFloatVal());
+                    break;
+                case VarType::VarInteger:
+                    values.push(var->GetIntVal());
+                    break;
+                case VarType::VarBool:
+                    values.push(var->GetIntVal());
+                    break;
+                case VarType::VarVar:
+
+                    switch (var->GetCurrentType()) {
+                    case VarInteger:
+                        values.push(var->GetIntVal());
+                        break;
+                    case VarFloat:
+                        values.push((int)var->GetFloatVal());
+                        break;
+                    }
+
+                    break;
+                }
+
+
+
+                int a = 5;
+                /*
                 for (int i = 0; i < 16; i++)
                 {
                     if (tok.mNameHash[i] != 0)
@@ -279,6 +345,7 @@ int evaluateInt(std::vector<ExpressionElement> mElements) {
                         //---
                       
                     }//values.push(333);
+                
                 }
                 else {
                     auto evar = ZScriptContext::CurrentContext->GetScope()->FindVar(tok.mNameHash[0]);
@@ -309,6 +376,7 @@ int evaluateInt(std::vector<ExpressionElement> mElements) {
                         break;
                     }
                 }
+                */
             }
         }
         else if (tok.mOp == OpRightBrace)
@@ -444,72 +512,42 @@ float GetValue(ExpressionElement tok)
     }
     else if (tok.mType == EVar)
     {
+   
         int depth = 0;
-        for (int i = 0; i < 16; i++)
-        {
-            if (tok.mNameHash[i] != 0)
-            {
-                depth++;
-            }
-            else {
-                break;
-            }
-        }
+        auto var = GetVar(tok.mNameHash[0], tok.mNameHash[1]);
+        switch (var->GetType()) {
+        case VarType::VarExpr:
 
-        if (depth > 1)
-        {
-            if (ZScriptContext::CurrentContext->IsStaticClass(tok.mNameHash[0])) {
+            return var->GetExpr()->Exec({})->GetFloatVal();
+            break;
+        case VarType::VarFloat:
+            return var->GetFloatVal();
 
-                auto scls = ZScriptContext::CurrentContext->GetStaticClass(tok.mNameHash[0]);
+            break;
+        case VarType::VarInteger:
+            return (float)var->GetIntVal();
+            break;
 
-                auto gv = scls->FindVar(tok.mNameHash[1]);
-                //values.push(gv->GetFloatVal());
-                return gv->GetFloatVal();
+        case VarType::VarBool:
+            return (float)var->GetIntVal();
 
-            }
-            else {
-                auto cls = ZScriptContext::CurrentContext->GetScope()->FindVar(tok.mNameHash[0]);
-                auto av = cls->GetClassVal()->FindVar(tok.mNameHash[1]);
-                if (av->GetType() == VarType::VarInteger)
-                {
-                    return (float)av->GetIntVal();
-                    //   values.push((float)av->GetIntVal());
-                }
-                else {
-                    //values.push(av->GetFloatVal())
-                    return av->GetFloatVal();
-                }
-            }//values.push(333);
-        }
-        else {
-            auto evar = ZScriptContext::CurrentContext->GetScope()->FindVar(tok.mNameHash[0]);
-            if (evar->GetType() == VarType::VarInteger) {
+            break;
 
-                //values.push((float)evar->GetIntVal());
-                return (float)evar->GetIntVal();
-            }
-            else if (evar->GetType() == VarType::VarFloat) {
-                //values.push(evar->GetFloatVal());
-                return evar->GetFloatVal();
-            }
-            else if (evar->GetType() == VarType::VarVar)
-            {
-                
-            switch (evar->GetCurrentType()) {
+        case VarType::VarVar:
+
+            switch (var->GetCurrentType()) {
             case VarInteger:
-                return (float)evar->GetIntVal();
-                //values.push(evar->GetIntVal());
+                return (float)var->GetIntVal();
                 break;
             case VarFloat:
-                return evar->GetFloatVal();
+                return (float)var->GetFloatVal();
                 break;
             }
 
-      
-
-            }
-
+            break;
         }
+
+        
     }
     return 0.0f;
 }
@@ -625,37 +663,6 @@ Expression ZExpressionNode::GetExpression() {
 
 }
 
-ZContextVar* GetVar(size_t name1, size_t name2) {
-    ZContextVar* var = nullptr;
-   
-    if (ZScriptContext::CurrentContext->IsEnum(name1)) {
-
-        auto en = ZScriptContext::CurrentContext->GetEnum(name1);
-        
-        auto ri = VMakeInt(en->GetHashOptionIndex(name2));
-        return ri;
-
-        int a = 5;
-    }
-
-    if (ZScriptContext::CurrentContext->IsStaticClass(name1))
-    {
-        auto scls = ZScriptContext::CurrentContext->GetStaticClass(name1);
-        var = scls->FindVar(name2);
-
-    }
-    else {
-
-        var = ZScriptContext::CurrentContext->GetScope()->FindVar(name1);
-        if (name2 != 0)
-        {
-            auto cls = var->GetClassVal();
-            var = cls->FindVar(name2);
-        }
-
-    }
-    return var;
-}
 
 /*
 ZContextVar* GetVar(std::string name1,std::string name2) {

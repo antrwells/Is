@@ -16,6 +16,13 @@ ZTokenizer::ZTokenizer(ZSource* source)
 
 }
 
+ZTokenizer::ZTokenizer(std::string code) {
+
+	mCode.push_back(code);
+	
+
+}
+
 bool vec_contains(std::vector<char> vec, char look)
 {
 
@@ -122,6 +129,7 @@ ZTokenStream* ZTokenizer::Tokenize() {
 	std::vector<Token> tokens;
 
 	int ctoks = 0;
+	int ls = 0;
 
 	for (int i = 0; i < mCode.size(); i++) {
 
@@ -157,12 +165,14 @@ ZTokenStream* ZTokenizer::Tokenize() {
 				}
 				else {
 					if (is_float) {
-						tokens.push_back(Token(TokenType::TokenFloat, cur_token));
+						tokens.push_back(Token(TokenType::TokenFloat, cur_token,i,ls));
 						s_tok++;
+			
 					}
 					else {
-						tokens.push_back(Token(TokenType::TokenInt, cur_token));
+						tokens.push_back(Token(TokenType::TokenInt, cur_token,i,ls));
 						s_tok++;
+					
 					}
 					cur_token = "";
 					is_number = false;
@@ -176,9 +186,10 @@ ZTokenStream* ZTokenizer::Tokenize() {
 				if (ch == "\""[0])
 				{
 					is_string = false;
-					tokens.push_back(Token(TokenType::TokenString, cur_token));
+					tokens.push_back(Token(TokenType::TokenString, cur_token,i,ls));
 					cur_token = "";
 					s_tok++;
+				
 					continue;
 				}
 				else {
@@ -192,6 +203,10 @@ ZTokenStream* ZTokenizer::Tokenize() {
 			if (vec_contains(is_text, ch))
 			{
 				cur_token = cur_token + ch;
+				if (cur_token.size() == 1)
+				{
+					ls = c;
+				}
 			}
 			else {
 
@@ -202,8 +217,9 @@ ZTokenStream* ZTokenizer::Tokenize() {
 						cur_token = cur_token + ch;
 						continue;
 					}
-					tokens.push_back(Token(TokenType::TokenIdent, cur_token));
+					tokens.push_back(Token(TokenType::TokenIdent, cur_token,i,ls));
 					s_tok++;
+					
 					cur_token = "";
 				}
 
@@ -212,14 +228,16 @@ ZTokenStream* ZTokenizer::Tokenize() {
 					//if (is_string == false) {
 						std::string op = "";
 						op = op + ch;
-						tokens.push_back(Token(TokenType::TokenOperator, op));
+						tokens.push_back(Token(TokenType::TokenOperator, op,i,c));
 						s_tok++;
+						
 					//}
 
 				}
 				else if (ch == "\""[0])
 				{
 					is_string = true;
+					ls = c;
 
 				}
 				else if (vec_contains(is_num, ch)) {
@@ -236,28 +254,30 @@ ZTokenStream* ZTokenizer::Tokenize() {
 		if (cur_token.size() > 0) {
 
 			if (is_string) {
-				tokens.push_back(Token(TokenType::TokenString, cur_token));
+				tokens.push_back(Token(TokenType::TokenString, cur_token,i,ls));
 				s_tok++;
+				
 			}
 			else if (is_number) {
 				if (is_float) {
-					tokens.push_back(Token(TokenType::TokenFloat, cur_token));
+					tokens.push_back(Token(TokenType::TokenFloat, cur_token,i,ls));
 					s_tok++;
+			
 				}
 				else {
-					tokens.push_back(Token(TokenType::TokenInt, cur_token));
+					tokens.push_back(Token(TokenType::TokenInt, cur_token,i,ls));
 					s_tok++;
 				}
 				}
 			else {
-				tokens.push_back(Token(TokenType::TokenIdent, cur_token));
+				tokens.push_back(Token(TokenType::TokenIdent, cur_token,i,ls));
 				s_tok++;
 			}
 
 		}
 
 		if (s_tok > 0) {
-			tokens.push_back(Token(TokenType::TokenEndOfLine, ";"));
+			tokens.push_back(Token(TokenType::TokenEndOfLine, ";",0,0));
 		}
 	}
 
@@ -322,7 +342,7 @@ ZTokenStream* ZTokenizer::Tokenize() {
 
 		auto old_token = tokens[i];
 
-		Token new_token = Token(old_token.mType, old_token.mText);
+		Token new_token = Token(old_token.mType, old_token.mText,old_token.TokenLineIndex,old_token.TokenIndex);
 
 		if (token_map.find(old_token.mText) != token_map.end()) {
 			if (new_token.mType != TokenType::TokenString)
@@ -443,62 +463,72 @@ ZTokenStream* ZTokenizer::Tokenize() {
 
 	bool p_op = false;
 	bool p_num = false;
-	for (int i = 0; i < new_tokens2.size()-1; i++) {
+	if (new_tokens.size() > 0)
+	{
 
-		auto tok = new_tokens2[i];
+		for (int i = 0; i < new_tokens2.size() - 1; i++) {
 
-		switch (tok.mType) {
-		//case TokenType::TokenSame:
+			auto tok = new_tokens2[i];
 
-		case TokenType::TokenPlus:
-		case TokenType::TokenMultiply:
-		case TokenType::TokenMinus:
-		case TokenType::TokenDivide:
-			if(!p_op && !p_num) {
+			switch (tok.mType) {
+				//case TokenType::TokenSame:
 
-				if (tok.mType == TokenType::TokenMinus) {
-					auto nt = new_tokens2[i + 1];
-					switch (nt.mType) {
-					case TokenType::TokenFloat:
-					case TokenType::TokenInt:
-					case TokenType::TokenIdent:
+			case TokenType::TokenPlus:
+			case TokenType::TokenMultiply:
+			case TokenType::TokenMinus:
+			case TokenType::TokenDivide:
+				if (!p_op && !p_num) {
 
-						tok.mType = TokenType::TokenUMinus;
-						new_tokens3.push_back(tok);
-						p_op = false;
-						p_num = false;
-						continue;
+					if (tok.mType == TokenType::TokenMinus) {
+						auto nt = new_tokens2[i + 1];
+						switch (nt.mType) {
+						case TokenType::TokenFloat:
+						case TokenType::TokenInt:
+						case TokenType::TokenIdent:
 
-						break;
-						
+							tok.mType = TokenType::TokenUMinus;
+							new_tokens3.push_back(tok);
+							p_op = false;
+							p_num = false;
+							continue;
+
+							break;
+
+						}
 					}
-				}
-				else {
-					break;
-				}
-				int aa = 5;
+					else {
+						break;
+					}
+					int aa = 5;
 
+				}
+				p_op = true;
+				p_num = false;
+				break;
+			case TokenType::TokenInt:
+				p_op = false;
+				p_num = true;
+				break;
+			default:
+				p_num = false;
+				p_op = false;
 			}
-			p_op = true;
-			p_num = false;
-			break;
-		case TokenType::TokenInt:
-			p_op = false;
-			p_num = true;
-			break;
-		default:
-			p_num = false;
-			p_op = false;
+			new_tokens3.push_back(tok);
 		}
-		new_tokens3.push_back(tok);
+
+
+		auto tok_stream = new ZTokenStream();
+		tok_stream->SetTokens(new_tokens3);
+		return tok_stream;
+	}
+	else {
+		auto tok_stream = new ZTokenStream();
+		tok_stream->SetTokens(new_tokens2);
+		return tok_stream;
+
 	}
 
-	auto tok_stream = new ZTokenStream();
-	tok_stream->SetTokens(new_tokens3);
-
-
-
-	return tok_stream;
+	
 
 }													
 

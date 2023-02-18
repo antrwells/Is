@@ -14,7 +14,7 @@ void ZSource::AddLine(std::string line)
 	Clean();
 }
 
-ZSource::ZSource(std::string path) {
+ZSource::ZSource(std::string path,bool clean) {
 
 	mPath = path;
 
@@ -29,7 +29,9 @@ ZSource::ZSource(std::string path) {
 	}
 
 	source_file.close();
-	Clean();
+	if (clean) {
+		Clean();
+	}
 
 }
 

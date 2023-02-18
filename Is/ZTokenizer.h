@@ -10,6 +10,7 @@ class ZTokenizer
 public:
 
 	ZTokenizer(ZSource * source);
+	ZTokenizer(std::string code);
 	ZTokenStream* Tokenize();
 	ZTokens* Finalize(ZTokenStream* stream);
 
