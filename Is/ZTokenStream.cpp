@@ -65,7 +65,8 @@ Token ZTokenStream::AssertNextToken(TokenType token_type) {
 
 	auto token = NextToken();
 
-	assert(token.mType == token_type);
+	//assert(token.mType == token_type);
+	//ERROR
 
 	return token;
 

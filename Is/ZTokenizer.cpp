@@ -277,7 +277,7 @@ ZTokenStream* ZTokenizer::Tokenize() {
 		}
 
 		if (s_tok > 0) {
-			tokens.push_back(Token(TokenType::TokenEndOfLine, ";",0,0));
+			tokens.push_back(Token(TokenType::TokenEndOfLine, ";",i,0));
 		}
 	}
 

@@ -13,6 +13,8 @@ DockArea::DockArea(QWidget *parent)
 	m_DockManager = new ads::CDockManager(this);
 	m_DockManager->setGeometry(0, 0, width(), height());
 
+	w_Console = new ConsoleOutputWidget;
+	m_DockManager->addDockWidget(ads::BottomDockWidgetArea, w_Console);
 
 }
 
@@ -40,6 +42,15 @@ void DockArea::LoadScript(std::string path)
 	page->SetCode(src);
 
 
+	update();
+
+}
+
+void DockArea::NewScript() {
+
+
+	auto page = AddNewPage();
+	page->setWindowTitle("New Script");
 	update();
 
 }

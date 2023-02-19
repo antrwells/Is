@@ -93,10 +93,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="IsScriptEditor.qrc" />
+    <QtUic Include="CodeComplete.ui" />
+    <QtUic Include="ConsoleOutputWidget.ui" />
     <QtUic Include="DockArea.ui" />
     <QtUic Include="IsCodePage.ui" />
     <QtUic Include="IsScriptEditor.ui" />
     <QtMoc Include="IsScriptEditor.h" />
+    <ClCompile Include="CodeComplete.cpp" />
+    <ClCompile Include="ConsoleOutputWidget.cpp" />
     <ClCompile Include="DockArea.cpp" />
     <ClCompile Include="IsCodePage.cpp" />
     <ClCompile Include="IsScriptEditor.cpp" />
@@ -107,6 +111,12 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="IsCodePage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="ConsoleOutputWidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="CodeComplete.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

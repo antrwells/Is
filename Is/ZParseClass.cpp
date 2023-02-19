@@ -119,9 +119,19 @@ ZScriptNode* ZParseClass::Parse()
 			break;
 		case TokenType::TokenEnd:
 			
+
 			if (!mStream->EOS()) {
+				//mStream->Back();
+				class_node->SetLineEnd(mStream->NextToken().TokenLineIndex);
+				mStream->Back();
 				mStream->AssertNextToken(TokenType::TokenEndOfLine);
 			}
+			else {
+			
+				mStream->Back();
+				class_node->SetLineEnd(mStream->NextToken().TokenLineIndex);
+			}
+			
 			return class_node;
 
 			break;

@@ -21,8 +21,11 @@ class IsScriptEditor : public QMainWindow
 public:
     IsScriptEditor(QWidget *parent = nullptr);
     ~IsScriptEditor();
+    static IsScriptEditor* mThis;
+    void SetStatus(std::string text);
 protected:
     void LoadFile();
+    void NewFile();
 
 private:
     Ui::IsScriptEditorClass ui;
@@ -30,4 +33,5 @@ private:
     QMenuBar* menu;
     QMenu* fileMenu;
     QToolBar* toolBar;
+    QStatusBar* status;
 };

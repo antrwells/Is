@@ -1,9 +1,15 @@
 #include "IsCodePage.h"
 #include <QRegularExpression>
 #include "ZSource.h"
-#include <QTextBlock>
+
 #include "ZTokenizer.h"
 #include "qfile.h"
+#include "ZParser.h"
+#include "ZClassNode.h"
+#include "ZMethodNode.h"
+#include "ConsoleOutputWidget.h"
+#include "IsScriptEditor.h"
+
 
 IsCodePage::IsCodePage(QWidget *parent)
 	: CDockWidget("Code",parent)
@@ -36,7 +42,12 @@ IsCodePage::IsCodePage(QWidget *parent)
 	mWordMap.insert(std::make_pair("var", QColor(128, 128, 0)));
 	mWordMap.insert(std::make_pair("(", QColor(255, 32, 0)));
 	mWordMap.insert(std::make_pair(")", QColor(255, 32, 0)));
+
+	mComplete = new CodeComplete(this);
+	mComplete->setGeometry(300, 60, 180, 220);
 	
+	mText->installEventFilter(this);
+
 }
 
 IsCodePage::~IsCodePage()
@@ -94,6 +105,89 @@ void IsCodePage::SetCode(ZSource* code) {
 
 
 }
+void replaceHalfWord(std::string& line, int pos, const std::string& replacement)
+{
+	// Find the beginning and end of the half-word
+	int start = pos;
+	while (start >= 0 && isalnum(line[start])) {
+		start--;
+	}
+	start++;
+
+	int end = pos;
+	while (end < line.length() && isalnum(line[end])) {
+		end++;
+	}
+
+	// Replace the half-word with the replacement string
+	if (end - start < replacement.length()) {
+		// The replacement word is longer than the half-word, so replace the whole word
+		int wordStart = start;
+		while (wordStart >= 0 && !isspace(line[wordStart])) {
+			wordStart--;
+		}
+		wordStart++;
+
+		int wordEnd = end;
+		while (wordEnd < line.length() && !isspace(line[wordEnd])) {
+			wordEnd++;
+		}
+
+		if (wordEnd - wordStart >= replacement.length()) {
+			// The word is long enough to fit the replacement word
+			line.replace(wordStart, wordEnd - wordStart, replacement);
+		}
+		else {
+			// The word is too short to fit the replacement word, so insert it
+			line.insert(end, " " + replacement);
+		}
+	}
+	else {
+		// The replacement word is shorter than or equal to the half-word, so replace the half-word
+		line.replace(start, end - start, replacement);
+	}
+}
+
+std::string getPreviousToken(const std::string& text, int pos)
+{
+	// Initialize the token string
+	std::string token = "";
+
+	// Traverse backwards from the given position until a viable token is found
+	for (int i = pos - 1; i >= 0; i--) {
+		char c = text[i];
+		if (isspace(c) || ispunct(c)) {
+			if (token.empty()) {
+				// Skip leading spaces and operators
+				continue;
+			}
+			else {
+				// A viable token has been found
+				return token;
+			}
+		}
+		else {
+			// Add the character to the token string
+			token = c + token;
+		}
+		if (i == 0) {
+			// The beginning of the string has been reached
+			if (!token.empty()) {
+				// A viable token has been found
+				return token;
+			}
+			else {
+				// No viable token was found
+				return "";
+			}
+		}
+	}
+
+	// No viable token was found
+	return "";
+}
+
+
 
 void IsCodePage::TextChange() {
 
@@ -112,6 +206,41 @@ void IsCodePage::TextChange() {
 
 	// Start the timer
 	rehighlight->start();
+
+	std::string msg = "Script:" + windowTitle().toStdString();
+
+	msg = msg + " Line:" + std::to_string(CurrentLine());
+
+	IsScriptEditor::mThis->SetStatus(msg);
+
+	QRect cursorRect = mText->cursorRect();
+	int cursorY = cursorRect.top();
+	int cursorX = cursorRect.right();
+	mComplete->setGeometry(cursorX+30, cursorY, mComplete->width(), mComplete->height());
+	
+	QTextCursor cursor = mText->textCursor();
+	QTextBlock block = cursor.block();
+	QString lineText = block.text();
+
+	std::string line = lineText.toStdString();
+	
+	if (line.size() == 0) {
+		mComplete->setVisible(false);
+	}
+	else {
+		QTextCursor cursor = mText->textCursor();
+		int blockPosition = cursor.block().position();
+		int cursorPosition = cursor.position();
+		int currentCharX = cursorPosition - blockPosition;
+
+
+		auto lt = getPreviousToken(lineText.toStdString(), currentCharX);
+		if (lt.size() > 0) {
+			ConsoleOutputWidget::LogMessage(lt);
+		}
+		mComplete->SetFilter(lt);
+	}
+	
 
 
 }
@@ -134,6 +263,52 @@ void IsCodePage::retoken() {
 	SetCode(src);
 	cursor.setPosition(cp); // set the cursor position
 	mText->setTextCursor(cursor); // set the cursor in the text edit
+
+	ConsoleOutputWidget::LogMessage("Compiling/testing code...");
+	mToker = new ZTokenizer(mSource);
+	auto s = mToker->Tokenize();
+	auto parser = new ZParser(s);
+	 mNode = parser->Parse();
+	std::string c_msg = "Compiled. Classes found:" + std::to_string(mNode->GetClasses().size());
+	ConsoleOutputWidget::LogMessage(c_msg);
+
+	auto classes = mNode->GetClasses();
+
+	for (int i = 0; i < classes.size(); i++) {
+		
+		auto cls = classes[i];
+		
+		std::string msg = "Class:" + cls->GetName();
+
+		ConsoleOutputWidget::LogMessage(msg);
+
+		msg = "Method Count:" + std::to_string(cls->GetMethods().size());
+
+		ConsoleOutputWidget::LogMessage(msg);
+
+		for (int j = 0; j < cls->GetMethods().size(); j++) {
+
+			auto meth = cls->GetMethods()[j];
+			msg = "Method:" + meth->GetName();
+
+			ConsoleOutputWidget::LogMessage(msg);
+
+		}
+
+
+	}
+	mComplete->SetMode(CCMode::Classes);
+	
+	auto ci = ClassWithin();
+
+	if (ci != nullptr) {
+
+		mComplete->SetMode(CCMode::SpecificClass);
+		std::vector<ZContextVar*> pars = {};
+		mComplete->SetClass(ci->CreateInstance("CC", pars));
+	}
+
+	mComplete->SetNode(mNode);
 
 
 }
@@ -227,5 +402,148 @@ void IsCodePage::Tokenize() {
 
 
 	}
+
+}
+
+int IsCodePage::CurrentLine() {
+
+	
+
+	auto cursor = mText->textCursor();
+	return cursor.blockNumber();
+
+
+}
+
+ZClassNode* IsCodePage::ClassWithin() {
+
+	ZClassNode* r = nullptr;
+
+	auto line = CurrentLine();
+
+	auto classes = mNode->GetClasses();
+
+	for (int i = 0; i < classes.size(); i++) {
+
+		auto cls = classes[i];
+
+		if (cls->GetLineStart() <= line && cls->GetLineEnd() >= line) {
+
+			r = cls;
+
+			break;
+
+		}
+
+	}
+
+	return r;
+
+}
+
+void insertStringAtCurrentPosition(QTextEdit* textEdit, std::string str) {
+	// Get the current cursor position within the line
+	QTextCursor cursor = textEdit->textCursor();
+	int line_start_pos = cursor.block().position();
+	int cursor_pos = cursor.position();
+	int current_pos = cursor_pos - line_start_pos - 1;
+
+	// Insert the string at the current position
+	cursor.insertText(QString::fromStdString(str));
+	cursor.setPosition(line_start_pos + current_pos + str.length() + 1);
+	textEdit->setTextCursor(cursor);
+}
+
+int find_substring(std::string word, std::string substring) {
+	int pos = word.find(substring); // find the position of the substring in the word
+	if (pos == std::string::npos) { // if substring is not found, return -1
+		return -1;
+	}
+	else { // otherwise, return the starting position of the substring
+		return pos;
+	}
+}
+
+std::string getCurrentLine(QTextEdit* textEdit) {
+	QTextCursor cursor = textEdit->textCursor(); // get the cursor of the text edit
+	cursor.movePosition(QTextCursor::StartOfLine); // move the cursor to the start of the current line
+	int startPos = cursor.position();
+	cursor.movePosition(QTextCursor::EndOfLine); // move the cursor to the end of the current line
+	int endPos = cursor.position();
+	QString line = textEdit->toPlainText().mid(startPos, endPos - startPos); // get the current line of text as a QString
+	return line.toStdString(); // convert the QString to a std::string and return it
+}
+
+void replaceCurrentLine(QTextEdit* textEdit, const QString& newLine) {
+	QTextCursor cursor = textEdit->textCursor(); // get the cursor of the text edit
+	cursor.movePosition(QTextCursor::StartOfLine); // move the cursor to the start of the current line
+	int startPos = cursor.position();
+	cursor.movePosition(QTextCursor::EndOfLine); // move the cursor to the end of the current line
+	int endPos = cursor.position();
+	cursor.setPosition(startPos, QTextCursor::KeepAnchor); // select the current line
+	cursor.insertText(newLine); // replace the current line with the new line
+}
+
+int getXPosition(QTextEdit *textEdit) {
+    QTextCursor cursor = textEdit->textCursor(); // get the cursor of the text edit
+    cursor.movePosition(QTextCursor::StartOfLine); // move the cursor to the start of the line
+    int startPos = cursor.position();
+    int x = cursor.positionInBlock(); // get the x position (in characters) of the cursor
+    return x; // return the total x position (in characters)
+}
+
+void IsCodePage::InsertSmart(std::string word) {
+
+
+	QTextCursor cursor = mText->textCursor();
+	QTextBlock block = cursor.block();
+	QString lineText = block.text();
+
+	std::string line = lineText.toStdString();
+
+	//replaceCurrentHalfWord(mText, word);
+	cursor = mText->textCursor();
+	int blockPosition = cursor.block().position();
+	int cursorPosition = cursor.position();
+	int currentCharX = cursorPosition - blockPosition;
+
+
+	auto lt = getPreviousToken(lineText.toStdString(), currentCharX);
+	
+	if (lt.size() > 0) {
+
+		auto ss = find_substring(word, lt);
+		if (ss > -1)
+		{
+
+			std::string curLine = getCurrentLine(mText);
+
+			int sa = find_substring(curLine,lt);
+			
+			std::string pre = curLine.substr(0, sa);
+			std::string post = curLine.substr(sa+lt.size(),curLine.size()-(sa+lt.size()));
+			
+			replaceCurrentLine(mText, QString::fromStdString(pre + word + post));
+
+			int a = 5;
+		}
+
+	}
+	else {
+
+		std::string curLine = getCurrentLine(mText);
+
+		int sa = getXPosition(mText);
+
+		std::string pre = curLine.substr(0, sa+1);
+		std::string post = curLine.substr(sa+2, curLine.size() - sa-1);
+
+		replaceCurrentLine(mText, QString::fromStdString(pre + word + post));
+
+	}
+
+
+	int a = 5;
+
 
 }

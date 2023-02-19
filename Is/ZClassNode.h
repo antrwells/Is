@@ -68,6 +68,19 @@ public:
 	size_t GetHashName() {
 		return mHashName;
 	}
+	void SetLineStart(int line) {
+		mLineStart = line;
+	}
+	void SetLineEnd(int line) {
+		mLineEnd = line;
+	}
+	int GetLineStart() {
+		return mLineStart;
+	}
+	int GetLineEnd() {
+		return mLineEnd;
+	}
+
 private:
 	
 	std::string mBaseClassName;
@@ -79,6 +92,8 @@ private:
 	ZContextScope* mInstanceScope;
 	size_t mHashName;
 	std::vector<ZVarsNode*> mVars;
+	int mLineStart = 0;
+	int mLineEnd = 0;
 
 };
 

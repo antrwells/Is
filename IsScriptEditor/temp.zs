@@ -1,12 +1,16 @@
-class IDE
+class myClass
 
-    method void InitIDE()
+	int ant,wells,other
 
-        if 
+	method void CheckMethod()
 
-        console("Welcome to Trinity3D - The future is 3D")        
+		ant = 25 
+
+		other = 30
+
+		CheckMethod
 
 
-    end 
+	end 
 
 end 

@@ -19,7 +19,7 @@ ZScriptNode* ZParseSignature::Parse() {
 	if (check.mType != TokenType::TokenLeftPara)
 	{
 		///*ERROR*
-		assert(false);
+		return nullptr;
 	}
 
 	auto sig_node = new ZSignatureNode;

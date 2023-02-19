@@ -46,6 +46,12 @@
     <ClCompile Include="IsCodePage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ConsoleOutputWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeComplete.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="DockArea.h">
@@ -54,12 +60,24 @@
     <QtMoc Include="IsCodePage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="ConsoleOutputWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CodeComplete.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="DockArea.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="IsCodePage.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="ConsoleOutputWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="CodeComplete.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

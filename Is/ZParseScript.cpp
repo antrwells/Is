@@ -3,6 +3,7 @@
 #include "ZParseClass.h"
 #include "ZParseEnum.h"
 #include "ZEnumNode.h"
+#include "ZClassNode.h"
 //#include
 
 
@@ -61,8 +62,12 @@ ZScriptNode* ZParseScript::Parse()
 
 
 			auto parse_class = new ZParseClass(mStream);
+
+			int line_start = mStream->PeekToken(0).TokenLineIndex;
 			
 			auto class_node = (ZClassNode*) parse_class->Parse();
+
+			class_node->SetLineStart(line_start);
 
 			main_node->AddClass(class_node);
 			
