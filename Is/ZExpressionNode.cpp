@@ -1204,8 +1204,20 @@ ZContextVar* Expression::Evaluate(VarType recv) {
             return VMakeString(mElements[0].mValString);
         }
 
-        VMakeFloat(evaluateFloat(mElements));
-        
+
+      //  switch(mElements[0].ge)
+
+        auto gt = GetVar(mElements[0].mNameHash[0], mElements[0].mNameHash[1]);
+
+        switch (gt->GetType()) {
+        case VarType::VarFloat:
+
+            return VMakeFloat(evaluateFloat(mElements));
+            break;
+        case VarType::VarInteger:
+            return VMakeInt(evaluateInt(mElements));
+            break;
+        }
         int bb = 0;
 
         break;
