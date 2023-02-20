@@ -36,7 +36,9 @@ public:
     void SetCodeOwner(ZCodeBodyNode* code);
     void SetBaseType(std::string);
     std::string GetBaseType();
-
+    void SetToArray() {
+        mIsArray = true;
+    }
     
 private:
 
@@ -46,6 +48,7 @@ private:
     ZClassNode* mClassOwner = nullptr;
     ZCodeBodyNode* mCodeOwner = nullptr;
     std::string TypeID;
+    bool mIsArray = false;
 
 
 };

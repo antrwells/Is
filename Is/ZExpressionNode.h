@@ -42,6 +42,7 @@ public:
     ZStatementNode* mStatement = nullptr;
     ZClassStatementNode* mClassStatement = nullptr;
     ZNewNode* mNew = nullptr;
+    ZExpressionNode* mAccess = nullptr;
 
 };
 int precedence(ExprOperatorType op);

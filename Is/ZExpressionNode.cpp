@@ -855,6 +855,33 @@ ZContextVar* Expression::Evaluate(VarType recv) {
                 return var->GetExpr()->Exec({});
             }
             if (var != nullptr) {
+                if (var->GetArray()) {
+                    
+                    switch (var->GetType())
+                    {
+                    case VarType::VarInteger:
+                    {
+                        int acc = mElements[0].mAccess->Exec({})->GetIntVal();
+
+                        int* rv = (int*)var->GetMem(acc * sizeof(int));
+
+                        return VMakeInt(rv[0]);
+                    }
+                        break;
+                    case VarType::VarFloat:
+                    {
+                        int acc = mElements[0].mAccess->Exec({})->GetIntVal();
+
+                        float* rv = (float*)var->GetMem(acc * sizeof(float));
+
+                        return VMakeFloat(rv[0]);
+                    }
+                        break;
+                    }
+                    //var->GetMem()
+                    int a = 5;
+
+                }
                 return var;
             }
             int aa = 5;
@@ -926,7 +953,7 @@ ZContextVar* Expression::Evaluate(VarType recv) {
         }
         if (mElements[0].mType == EFloat)
         {
-            return VMakeInt(mElements[0].mValFloat);
+            return VMakeFloat(mElements[0].mValFloat);
         }
         if (mElements[0].mType == EStatement)
         {

@@ -63,6 +63,26 @@ public:
 	ZExpressionNode* GetExpr() {
 		return mExpr;
 	}
+	void SetMemSize(int size) {
+
+		mMem = (void*)malloc(size);
+
+	}
+
+	void SetMem(int pos, void* data, int size) {
+		memcpy((char*)mMem + pos, data, size);
+	}
+	
+	void* GetMem(int pos) {
+		return (char*)mMem + pos;
+	}
+	void SetArray(bool ar)
+	{
+		mIsArray = ar;
+	}	
+	bool GetArray() {
+		return mIsArray;
+	}
 private:
 
 	std::string mName;
@@ -83,7 +103,8 @@ private:
 	size_t mHashName;
 	std::vector<ZContextVar*> mList;
 	ZExpressionNode* mExpr = nullptr;
-
+	void* mMem = nullptr;
+	bool mIsArray = false;
 };
 
 

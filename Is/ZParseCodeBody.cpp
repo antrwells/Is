@@ -38,6 +38,8 @@ CodeType ZParseCodeBody::PredictType() {
 		auto token = mStream->PeekToken(peek_val);
 
 		switch (token.mType) {
+		case TokenType::TokenLeftArray:
+			return CodeType::CodeAssign;
 		case TokenType::TokenReturn:
 			return CodeType::CodeReturn;
 		case TokenType::TokenIf:
@@ -97,6 +99,7 @@ CodeType ZParseCodeBody::PredictType() {
 		case TokenType::TokenVar:
 		case TokenType::TokenBool:
 		case TokenType::TokenList:
+		case TokenType::TokenMem:
 			return CodeType::CodeDeclareVars;
 			break;
 		case TokenType::TokenListAdd:
@@ -429,6 +432,7 @@ ZScriptNode* ZParseCodeBody::Parse() {
 			return codebody;
 
 			break;
+		case CodeType::CodeMem:
 		case CodeType::CodeDeclareVars:
 
 			if (mStream->PeekToken(0).mType == TokenType::TokenEndOfLine) {

@@ -66,14 +66,49 @@ ZContextVar* ZAssignNode::Exec(const std::vector<ZContextVar*>& params)
 	}
 		break;
 	case VarType::VarInteger:
-		
 		ZExpressionNode::RecvType = VarInteger;
-		evar->SetInt(mValue->Exec(std::vector<ZContextVar*>())->GetIntVal());
+		if (evar->GetArray()) {
+
+			int av = mAccess->Exec({})->GetIntVal();
+
+			int pos = av * sizeof(int);
+
+			
+				int fv = mValue->Exec({})->GetIntVal();
+
+				evar->SetMem(pos, &fv, sizeof(int));
+			
+	
 		
+		
+
+		}
+		else {
+			
+			evar->SetInt(mValue->Exec(std::vector<ZContextVar*>())->GetIntVal());
+		}
 		break;
 	case VarType::VarFloat:
 		ZExpressionNode::RecvType = VarFloat;
-		evar->SetFloat(mValue->Exec(std::vector<ZContextVar*>())->GetFloatVal());
+		if (evar->GetArray()) {
+
+			int av = mAccess->Exec({})->GetIntVal();
+
+			int pos = av * sizeof(float);
+
+
+			float fv = mValue->Exec({})->GetFloatVal();
+
+			evar->SetMem(pos, &fv, sizeof(float));
+
+
+
+
+
+		}
+		else {
+			evar->SetFloat(mValue->Exec(std::vector<ZContextVar*>())->GetFloatVal());
+		}
 		break;
 	case VarType::VarString:
 		ZExpressionNode::RecvType = VarString;

@@ -14,6 +14,14 @@ ZScriptNode* ZParseAssign::Parse() {
 
 	auto tok = mStream->NextToken();
 
+	if (tok.mType == TokenType::TokenLeftArray) {
+
+		mStream->Back();
+		mStream->Back();
+		tok = mStream->NextToken();
+
+	}
+
 	if (tok.mType == TokenType::TokenPeriod)
 	{
 		mStream->Back();
@@ -38,7 +46,24 @@ ZScriptNode* ZParseAssign::Parse() {
 
 	int bb = 5;
 
-	mStream->NextToken();
+	auto cn = mStream->NextToken();
+
+	if (cn.mType == TokenType::TokenLeftArray)
+	{
+
+		auto p_val = new ZParseExpression(mStream);
+		auto val_node = p_val->Parse();
+
+		r_node->SetAccess((ZExpressionNode*)val_node);
+
+		cn = mStream->NextToken();
+
+		if (cn.mType == TokenType::TokenRightArray)
+		{
+
+		}
+
+	}
 
 	auto p_val = new ZParseExpression(mStream);
 	auto val_node = p_val->Parse();

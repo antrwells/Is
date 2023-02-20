@@ -35,6 +35,18 @@ ZScriptNode* ZParseExpression::Parse() {
 	while (!mStream->EOS()) {
 
 		auto token = mStream->NextToken();
+
+		if (token.mType == TokenType::TokenLeftArray)
+		{
+			mStream->Back();
+			mStream->Back();
+			token = mStream->NextToken();
+		}
+		if (token.mType == TokenType::TokenRightArray) {
+
+			token = mStream->NextToken();
+
+		}
 		ExpressionElement ele;
 
 		int iVal;
@@ -206,6 +218,16 @@ ZScriptNode* ZParseExpression::Parse() {
 					ele.mStatement = state_node;
 					ele.mType = EStatement;
 
+
+				}
+				if (vt.mType == TokenType::TokenLeftArray)
+				{
+					mStream->NextToken();
+					auto acc_Expr = new ZParseExpression(mStream);
+					auto acc_Expr_node = (ZExpressionNode*)acc_Expr->Parse();
+
+					ele.mAccess = acc_Expr_node;
+					int v = 0;
 
 				}
 				int aa = 5;

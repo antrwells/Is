@@ -18,6 +18,9 @@ ZScriptNode* ZParseVars::Parse() {
 	bool is_class = false;
 	switch (var_type.mType)
 	{
+	case TokenType::TokenMem:
+		vars_node->SetType(VarType::VarMem);
+		break;
 	case TokenType::TokenList:
 		vars_node->SetType(VarType::VarList);
 		break;
@@ -53,6 +56,11 @@ ZScriptNode* ZParseVars::Parse() {
 
 		auto tok = mStream->NextToken();
 
+		if (tok.mType == TokenType::TokenRightArray)
+		{
+
+			continue;
+		}
 
 		bool comparer = false;
 		if (tok.mType == TokenType::TokenLeftPara) {
@@ -136,7 +144,25 @@ ZScriptNode* ZParseVars::Parse() {
 			{
 				def = nullptr;
 			}
+		
+			//mStream->Back();
+			auto ntok = mStream->PeekToken(0);
+			
+			bool isArray = false;
+			if (ntok.mType == TokenType::TokenLeftArray)
+			{
+				mStream->NextToken();
+				auto exp_parse = new ZParseExpression(mStream);
+				def = (ZExpressionNode*)exp_parse->Parse();
+				int aa = 5;
+				isArray = true;
+			}
+
 			vars_node->AddVar(tok.mText,def,comparer);
+			if (isArray) {
+				vars_node->SetToArray();
+			}
+
 		}
 		int aa = 5;
 

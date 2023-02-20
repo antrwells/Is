@@ -78,12 +78,30 @@ ZContextVar* ZVarsNode::Exec(const std::vector<ZContextVar*>& params)
 
 		auto var = mVars[i];
 		ZContextVar* new_var = new ZContextVar(var->name, this->mVarType,TypeID,var->comparer);
+		new_var->SetExpr(var->def);
+		if (mIsArray)
+		{
+			new_var->SetArray(true);
+			int asize = var->def->Exec({})->GetIntVal();
+			new_var->SetMemSize(asize * 4);
+			int a = 5;
+		}
 		ZClassNode* cls = nullptr;
 		new_var->SetBaseID(TypeID);
 
 		ZExpressionNode::RecvType = mVarType;
 
 		switch (mVarType) {
+		case VarMem:
+		{
+			auto expr = new_var->GetExpr();
+			auto res = expr->Exec({});
+
+			new_var->SetMemSize(res->GetIntVal());
+
+			int aa = 5;
+		}
+			break;
 		case VarVar:
 			if (var->def != nullptr) {
 
@@ -115,13 +133,17 @@ ZContextVar* ZVarsNode::Exec(const std::vector<ZContextVar*>& params)
 			}
 			break;
 		case VarInteger:
-			if (var->def != nullptr) {
-				new_var->SetInt(var->def->Exec({})->GetIntVal());
+			if (mIsArray == false) {
+				if (var->def != nullptr) {
+					new_var->SetInt(var->def->Exec({})->GetIntVal());
+				}
 			}
 			break;
 		case VarFloat:
-			if (var->def != nullptr) {
-				new_var->SetFloat(var->def->Exec({})->GetFloatVal());
+			if (mIsArray == false) {
+				if (var->def != nullptr) {
+					new_var->SetFloat(var->def->Exec({})->GetFloatVal());
+				}
 			}
 			break;
 		case VarBool:
