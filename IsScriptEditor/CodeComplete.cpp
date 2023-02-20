@@ -83,33 +83,45 @@ void CodeComplete::Rebuild() {
 	if (mNode == nullptr) return;
 	listWidget->clear();
 
-	filterAdd("method");
-	filterAdd("class");
-	filterAdd("var");
-	filterAdd("if");
-	filterAdd("else");
-	filterAdd("for");
-	filterAdd("while");
-	filterAdd("return");
-	filterAdd("break");
-	filterAdd("continue");
-	filterAdd("switch");
-	filterAdd("case");
-	filterAdd("default");
-	filterAdd("true");
-	filterAdd("false");
-	filterAdd("foreach");
-	filterAdd("in");
-	filterAdd("void");
-	filterAdd("int");
-	filterAdd("float");
-	filterAdd("double");
-	filterAdd("string");
-	filterAdd("bool");
-	filterAdd("null");
-	filterAdd("this");
-	filterAdd("new");
-	filterAdd("delete");
+	if (mFilter.size() == 0 && mClassFilter.size()==0) {
+		if (listWidget->count() > 0) {
+			setVisible(true);
+		}
+		else {
+			setVisible(false);
+		}
+		return;
+	}
+
+	if (mFilter.size() != 0) {
+		filterAdd("method");
+		filterAdd("class");
+		filterAdd("var");
+		filterAdd("if");
+		filterAdd("else");
+		filterAdd("for");
+		filterAdd("while");
+		filterAdd("return");
+		filterAdd("break");
+		filterAdd("continue");
+		filterAdd("switch");
+		filterAdd("case");
+		filterAdd("default");
+		filterAdd("true");
+		filterAdd("false");
+		filterAdd("foreach");
+		filterAdd("in");
+		filterAdd("void");
+		filterAdd("int");
+		filterAdd("float");
+		filterAdd("double");
+		filterAdd("string");
+		filterAdd("bool");
+		filterAdd("null");
+		filterAdd("this");
+		filterAdd("new");
+		filterAdd("delete");
+	}
 
 
 

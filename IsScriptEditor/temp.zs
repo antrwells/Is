@@ -18,8 +18,7 @@ class otherClass
 
 	method void Other()
 
-		myClass.thisVar = 25
-		myClass.otherVar = 30
+		myClass.thisVar = 25 + otherClass.Other()
 
 	end 
 
