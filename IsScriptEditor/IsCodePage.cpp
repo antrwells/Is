@@ -9,6 +9,7 @@
 #include "ZMethodNode.h"
 #include "ConsoleOutputWidget.h"
 #include "IsScriptEditor.h"
+#include "ZScriptContext.h"
 
 
 IsCodePage::IsCodePage(QWidget *parent)
@@ -99,7 +100,7 @@ void IsCodePage::SetCode(ZSource* code) {
 	mSource = code;
 	Tokenize();
 	mText->blockSignals(false);
-
+	//TextChange();
 	//mText->setText(QString::fromStdString(code));
     //highlightText();
 
@@ -373,6 +374,11 @@ void IsCodePage::TextChange() {
 		mComplete->SetClassFilter(cls_name);
 		int a = 5;
 	}
+	else {
+
+		//mComplete->SetClassFilter("");
+
+	}
 
 	
 	if (line.size() == 0) {
@@ -385,11 +391,19 @@ void IsCodePage::TextChange() {
 		int currentCharX = cursorPosition - blockPosition;
 
 
-		auto lt = getPreviousToken3(lineText.toStdString(), currentCharX);
-		if (lt.size() > 0) {
-			ConsoleOutputWidget::LogMessage(lt);
+		auto lt2 = getPreviousToken3(lineText.toStdString(), currentCharX);
+
+		std::string chr = lineText.toStdString().substr(currentCharX - 1, 1);
+
+		if (lt2.size() > 0) {
+			ConsoleOutputWidget::LogMessage("FILTER:" + lt2 + " CHR:" + chr);
 		}
-		mComplete->SetFilter(lt);
+		if (chr == ".") {
+			mComplete->SetFilter("");
+		}
+		else {
+			mComplete->SetFilter(lt2);
+		}
 	}
 	
 
@@ -415,13 +429,17 @@ void IsCodePage::retoken() {
 	cursor.setPosition(cp); // set the cursor position
 	mText->setTextCursor(cursor); // set the cursor in the text edit
 
-	ConsoleOutputWidget::LogMessage("Compiling/testing code...");
+//	ConsoleOutputWidget::LogMessage("Compiling/testing code...");
 	mToker = new ZTokenizer(mSource);
 	auto s = mToker->Tokenize();
 	auto parser = new ZParser(s);
 	 mNode = parser->Parse();
-	std::string c_msg = "Compiled. Classes found:" + std::to_string(mNode->GetClasses().size());
-	ConsoleOutputWidget::LogMessage(c_msg);
+	
+	 auto nc = new ZScriptContext;
+
+	 ZScriptContext::CurrentContext->AddNode(mNode);
+	//std::string c_msg = "Compiled. Classes found:" + std::to_string(mNode->GetClasses().size());
+	//ConsoleOutputWidget::LogMessage(c_msg);
 
 	auto classes = mNode->GetClasses();
 
@@ -431,18 +449,18 @@ void IsCodePage::retoken() {
 		
 		std::string msg = "Class:" + cls->GetName();
 
-		ConsoleOutputWidget::LogMessage(msg);
+		//ConsoleOutputWidget::LogMessage(msg);
 
 		msg = "Method Count:" + std::to_string(cls->GetMethods().size());
 
-		ConsoleOutputWidget::LogMessage(msg);
+//		ConsoleOutputWidget::LogMessage(msg);
 
 		for (int j = 0; j < cls->GetMethods().size(); j++) {
 
 			auto meth = cls->GetMethods()[j];
 			msg = "Method:" + meth->GetName();
 
-			ConsoleOutputWidget::LogMessage(msg);
+	//		ConsoleOutputWidget::LogMessage(msg);
 
 		}
 
@@ -679,14 +697,19 @@ void IsCodePage::InsertSmart(std::string word) {
 
 			std::string curLine = getCurrentLine(mText);
 
-			int sa = find_substringb(curLine,lt);
-			
+			int sa = find_substringb(curLine, lt);
+
 			std::string pre = curLine.substr(0, sa);
-			std::string post = curLine.substr(sa+lt.size(),curLine.size()-(sa+lt.size()));
-			
+			std::string post = curLine.substr(sa + lt.size(), curLine.size() - (sa + lt.size()));
+
 			replaceCurrentLine(mText, QString::fromStdString(pre + word + post));
 
 			int a = 5;
+		}
+		else {
+
+			replaceCurrentLine(mText, QString::fromStdString(line + word));
+
 		}
 
 	}

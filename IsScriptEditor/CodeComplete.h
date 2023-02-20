@@ -37,9 +37,23 @@ public:
 		mFilter = filter;
 		Rebuild();
 	}
+	void filterAdd(std::string name) {
+		if (name.find(mFilter) != std::string::npos) {
+			listWidget->addItem(name.c_str());
+			//std::cout << "Substring found!" << std::endl;
+		}
+		else {
+			
+			//std::cout << "Substring not found." << std::endl;
+		}
+	}
 	void SetClassFilter(std::string filter)
 	{
-		mClassFilter = filter;
+		if (filter != mClassFilter) {
+			mClassFilter = filter;
+			mClsFilter = nullptr;
+		}
+
 		Rebuild();
 	}
 	ZClassNode* GetClass(std::string name);
@@ -55,4 +69,5 @@ private:
 	ZClassNode* mClass = nullptr;
 	std::string mFilter = "";
 	std::string mClassFilter = "";
+	ZClassNode* mClsFilter = nullptr;
 };

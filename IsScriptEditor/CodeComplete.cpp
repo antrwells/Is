@@ -75,14 +75,126 @@ ZClassNode* CodeComplete::GetClass(std::string name) {
 
 	auto cls = mNode->GetClass(name);
 
-	return nullptr;
+	return cls;
 }
 
 void CodeComplete::Rebuild() {
 
 	if (mNode == nullptr) return;
 	listWidget->clear();
-	if (mMode == CCMode::Classes) {
+
+	filterAdd("method");
+	filterAdd("class");
+	filterAdd("var");
+	filterAdd("if");
+	filterAdd("else");
+	filterAdd("for");
+	filterAdd("while");
+	filterAdd("return");
+	filterAdd("break");
+	filterAdd("continue");
+	filterAdd("switch");
+	filterAdd("case");
+	filterAdd("default");
+	filterAdd("true");
+	filterAdd("false");
+	filterAdd("foreach");
+	filterAdd("in");
+	filterAdd("void");
+	filterAdd("int");
+	filterAdd("float");
+	filterAdd("double");
+	filterAdd("string");
+	filterAdd("bool");
+	filterAdd("null");
+	filterAdd("this");
+	filterAdd("new");
+	filterAdd("delete");
+
+
+
+	if (mClassFilter!="")
+	{
+		auto cls = GetClass(mClassFilter);
+
+		if (mClsFilter == nullptr) {
+			mClsFilter = cls->CreateInstance("CC", {});
+		
+		}
+
+		auto meths = mClsFilter->GetMethods();
+
+		for (int i = 0; i < meths.size(); i++) {
+
+			auto meth = meths[i];
+			std::string text = meth->GetName();// "V
+			if (text.find(mFilter) != std::string::npos) {
+
+				//std::cout << "Substring found!" << std::endl;
+			}
+			else {
+				continue;
+				//std::cout << "Substring not found." << std::endl;
+			}
+
+			listWidget->addItem(meth->GetName().c_str());
+
+			
+
+		}
+
+		for (int i = 0; i < mClsFilter->GetVars().size(); i++) {
+
+			auto var = mClsFilter->GetVars()[i];
+
+			std::string type = "Unknown";
+
+			switch (var->GetType()) {
+			case VarType::VarInteger:
+				type = "Integer";
+				break;
+			case VarType::VarFloat:
+				type = "Float";
+				break;
+			case VarType::VarString:
+				type = "String";
+				break;
+			case VarType::VarBool:
+				type = "Bool";
+				break;
+			case VarType::VarList:
+				type = "List";
+				break;
+
+			}
+
+			std::string text = var->GetName();// "Var:" + var->GetName() + " Type:" + type;
+
+
+
+			if (text.find(mFilter) != std::string::npos) {
+
+				//std::cout << "Substring found!" << std::endl;
+			}
+			else {
+				continue;
+				//std::cout << "Substring not found." << std::endl;
+			}
+
+			listWidget->addItem(text.c_str());
+
+		}
+
+		if (listWidget->count() > 0) {
+			setVisible(true);
+		}
+		else {
+			setVisible(false);
+		}
+		return;
+	}
+
+//	if (mMode == CCMode::Classes) {
 		for (int i = 0; i < mNode->GetClasses().size(); i++) {
 
 			auto cls = mNode->GetClasses()[i];
@@ -101,8 +213,8 @@ void CodeComplete::Rebuild() {
 			listWidget->addItem(cls->GetName().c_str());
 
 		}
-	}
-	else {
+
+//	else {
 		for (int i = 0; i < mClass->GetVars().size(); i++) {
 
 			auto var = mClass->GetVars()[i];
@@ -162,7 +274,7 @@ void CodeComplete::Rebuild() {
 
 		}
 
-	}
+	//}
 
 	if (listWidget->count() > 0) {
 		setVisible(true);

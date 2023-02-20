@@ -96,6 +96,7 @@ public:
 				
 				if (text.size() > 0)
 				{
+					mComplete->SetClassFilter("");
 					//QTextCursor cursor = mText->textCursor();
 					//cursor.insertText(text.c_str());
 					InsertSmart(text);

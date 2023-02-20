@@ -1,11 +1,27 @@
-class myClass
+class testClass
 
-	int ant,wells,other
+	int thisVar,otherVar,someVar
 
-	method void CheckMethod()
+end 
 
-		
+class myClass > testClass
 
-	end
+	int testVar
+
+	method void Check()
+
+	end 
+
+end 
+
+class otherClass
+
+	method void Other()
+
+		myClass.thisVar = 25
+		myClass.otherVar = 30
+
+	end 
+
 
 end 
