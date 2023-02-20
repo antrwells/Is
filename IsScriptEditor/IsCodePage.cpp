@@ -153,6 +153,139 @@ std::string getPreviousToken(const std::string& text, int pos)
 	// Initialize the token string
 	std::string token = "";
 
+	if (pos >= 0) {
+		if (text[pos] == '.') {
+			return ".";
+		}
+		if (text[pos] == ' ')
+		{
+			return "";
+		}
+		if (text[pos] == '\t')
+		{
+			return "";
+		}
+	}
+	if (pos >= 1) {
+		if (text[pos - 1] == '.') {
+			return ".";
+		}
+		if (text[pos - 1] == ' ')
+		{
+			return "";
+		}
+		if (text[pos - 1] == '\t')
+		{
+			return "";
+		}
+	}
+
+	// Traverse backwards from the given position until a viable token is found
+	for (int i = pos; i >= 0; i--) {
+		char c = text[i];
+		if (isspace(c) || ispunct(c)) {
+			if (token.empty()) {
+				// Skip leading spaces and operators
+				continue;
+			}
+			else {
+				// A viable token has been found
+				return token;
+			}
+		}
+		else {
+			// Add the character to the token string
+			token = c + token;
+		}
+		if (i == 0) {
+			// The beginning of the string has been reached
+			if (!token.empty()) {
+				// A viable token has been found
+				return token;
+			}
+			else {
+				// No viable token was found
+				return "";
+			}
+		}
+	}
+
+	// No viable token was found
+	return "";
+}
+
+std::string getPreviousToken2(const std::string& text, int pos)
+{
+	// Initialize the token string
+	std::string token = "";
+
+	if (pos >= 0) {
+		if (text[pos] == "."[0]) {
+			return ".";
+		}
+		if (text[pos] == " "[0])
+		{
+			return "";
+		}
+		if (text[pos] == "	"[0])
+		{
+			return "";
+		}
+	}
+	if (pos >= 1) {
+		if (text[pos-1] == "."[0]) {
+			return ".";
+		}
+		if (text[pos-1] == " "[0])
+		{
+			return "";
+		}
+		if (text[pos - 1] == "	"[0])
+		{
+			return "";
+		}
+	}
+
+	// Traverse backwards from the given position until a viable token is found
+	for (int i = pos ; i >= 0; i--) {
+		char c = text[i];
+		if (isspace(c) || ispunct(c)) {
+			if (token.empty()) {
+				// Skip leading spaces and operators
+				continue;
+			}
+			else {
+				// A viable token has been found
+				return token;
+			}
+		}
+		else {
+			// Add the character to the token string
+			token = c + token;
+		}
+		if (i == 0) {
+			// The beginning of the string has been reached
+			if (!token.empty()) {
+				// A viable token has been found
+				return token;
+			}
+			else {
+				// No viable token was found
+				return "";
+			}
+		}
+	}
+
+	// No viable token was found
+	return "";
+}
+
+
+std::string getPreviousToken3(const std::string& text, int pos)
+{
+	// Initialize the token string
+	std::string token = "";
+
 	// Traverse backwards from the given position until a viable token is found
 	for (int i = pos - 1; i >= 0; i--) {
 		char c = text[i];
@@ -187,8 +320,6 @@ std::string getPreviousToken(const std::string& text, int pos)
 	return "";
 }
 
-
-
 void IsCodePage::TextChange() {
 
 
@@ -218,11 +349,31 @@ void IsCodePage::TextChange() {
 	int cursorX = cursorRect.right();
 	mComplete->setGeometry(cursorX+30, cursorY, mComplete->width(), mComplete->height());
 	
+	
+
 	QTextCursor cursor = mText->textCursor();
 	QTextBlock block = cursor.block();
 	QString lineText = block.text();
 
 	std::string line = lineText.toStdString();
+
+	//replaceCurrentHalfWord(mText, word);
+	cursor = mText->textCursor();
+	int blockPosition = cursor.block().position();
+	int cursorPosition = cursor.position();
+	int currentCharX = cursorPosition - blockPosition;
+
+
+	auto lt = getPreviousToken(lineText.toStdString(), currentCharX);
+
+	if (lt == ".") {
+		ConsoleOutputWidget::LogMessage(lt);
+		std::string cls_name = getPreviousToken2(lineText.toStdString(), currentCharX - 2);
+
+		mComplete->SetClassFilter(cls_name);
+		int a = 5;
+	}
+
 	
 	if (line.size() == 0) {
 		mComplete->setVisible(false);
@@ -234,7 +385,7 @@ void IsCodePage::TextChange() {
 		int currentCharX = cursorPosition - blockPosition;
 
 
-		auto lt = getPreviousToken(lineText.toStdString(), currentCharX);
+		auto lt = getPreviousToken3(lineText.toStdString(), currentCharX);
 		if (lt.size() > 0) {
 			ConsoleOutputWidget::LogMessage(lt);
 		}
@@ -464,6 +615,16 @@ int find_substring(std::string word, std::string substring) {
 	}
 }
 
+int find_substringb(std::string word, std::string substring) {
+	int pos = word.rfind(substring); // find the position of the substring in the word, searching from the end of the word
+	if (pos == std::string::npos) { // if substring is not found, return -1
+		return -1;
+	}
+	else { // otherwise, return the starting position of the substring
+		return pos;
+	}
+}
+
 std::string getCurrentLine(QTextEdit* textEdit) {
 	QTextCursor cursor = textEdit->textCursor(); // get the cursor of the text edit
 	cursor.movePosition(QTextCursor::StartOfLine); // move the cursor to the start of the current line
@@ -508,7 +669,7 @@ void IsCodePage::InsertSmart(std::string word) {
 	int currentCharX = cursorPosition - blockPosition;
 
 
-	auto lt = getPreviousToken(lineText.toStdString(), currentCharX);
+	auto lt = getPreviousToken3(lineText.toStdString(), currentCharX);
 	
 	if (lt.size() > 0) {
 
@@ -518,7 +679,7 @@ void IsCodePage::InsertSmart(std::string word) {
 
 			std::string curLine = getCurrentLine(mText);
 
-			int sa = find_substring(curLine,lt);
+			int sa = find_substringb(curLine,lt);
 			
 			std::string pre = curLine.substr(0, sa);
 			std::string post = curLine.substr(sa+lt.size(),curLine.size()-(sa+lt.size()));
@@ -530,13 +691,13 @@ void IsCodePage::InsertSmart(std::string word) {
 
 	}
 	else {
-
+		int sa = currentCharX;
 		std::string curLine = getCurrentLine(mText);
 
-		int sa = getXPosition(mText);
+		
 
-		std::string pre = curLine.substr(0, sa+1);
-		std::string post = curLine.substr(sa+2, curLine.size() - sa-1);
+		std::string pre = curLine.substr(0, sa);
+		std::string post = curLine.substr(sa, curLine.size() - sa - 1);
 
 		replaceCurrentLine(mText, QString::fromStdString(pre + word + post));
 

@@ -71,6 +71,12 @@ void CodeComplete::SetNode(ZMainNode* node) {
 
 }
 
+ZClassNode* CodeComplete::GetClass(std::string name) {
+
+	auto cls = mNode->GetClass(name);
+
+	return nullptr;
+}
 
 void CodeComplete::Rebuild() {
 
@@ -160,6 +166,9 @@ void CodeComplete::Rebuild() {
 
 	if (listWidget->count() > 0) {
 		setVisible(true);
+	}
+	else {
+		setVisible(false);
 	}
 
 }

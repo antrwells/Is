@@ -4,13 +4,8 @@ class myClass
 
 	method void CheckMethod()
 
-		ant = 25 
+		
 
-		other = 30
-
-		CheckMethod
-
-
-	end 
+	end
 
 end 

@@ -37,6 +37,13 @@ public:
 		mFilter = filter;
 		Rebuild();
 	}
+	void SetClassFilter(std::string filter)
+	{
+		mClassFilter = filter;
+		Rebuild();
+	}
+	ZClassNode* GetClass(std::string name);
+
 protected:
 	virtual void paintEvent(QPaintEvent* event);
 	virtual void resizeEvent(QResizeEvent* event);
@@ -47,4 +54,5 @@ private:
 	CCMode mMode = CCMode::Classes;
 	ZClassNode* mClass = nullptr;
 	std::string mFilter = "";
+	std::string mClassFilter = "";
 };
