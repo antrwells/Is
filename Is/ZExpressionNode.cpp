@@ -230,10 +230,26 @@ int evaluateInt(std::vector<ExpressionElement> mElements) {
                     values.push((int)var->GetExpr()->Exec({})->GetIntVal());
                     break;
                 case VarType::VarFloat:
-                    values.push((int)var->GetFloatVal());
+                    if (var->GetArray()) {
+                        auto ip = tok.mAccess->Exec({})->GetIntVal();
+                        float* f = (float*)var->GetMem(ip * sizeof(float));
+                        values.push((int)f[0]);
+                    }
+                    else {
+                        values.push((int)var->GetFloatVal());
+                    }
                     break;
                 case VarType::VarInteger:
-                    values.push(var->GetIntVal());
+                    
+                    if (var->GetArray()) {
+                        auto ip = tok.mAccess->Exec({})->GetIntVal();
+                        int* f = (int*)var->GetMem(ip * sizeof(int));
+                        values.push(f[0]);
+                        
+                    }
+                    else {
+                        values.push(var->GetIntVal());
+                    }
                     break;
                 case VarType::VarBool:
                     values.push(var->GetIntVal());
@@ -521,10 +537,22 @@ float GetValue(ExpressionElement tok)
             return var->GetExpr()->Exec({})->GetFloatVal();
             break;
         case VarType::VarFloat:
+
+            if (var->GetArray()) {
+                auto ip = tok.mAccess->Exec({})->GetIntVal();
+                float* f = (float*)var->GetMem(ip * sizeof(float));
+                return (float)f[0];
+            }
+
             return var->GetFloatVal();
 
             break;
         case VarType::VarInteger:
+            if (var->GetArray()) {
+                auto ip = tok.mAccess->Exec({})->GetIntVal();
+                int* f = (int*)var->GetMem(ip * sizeof(int));
+                return (float)f[0];
+            }
             return (float)var->GetIntVal();
             break;
 

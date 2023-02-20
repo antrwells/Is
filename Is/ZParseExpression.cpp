@@ -44,7 +44,7 @@ ZScriptNode* ZParseExpression::Parse() {
 		}
 		if (token.mType == TokenType::TokenRightArray) {
 
-			token = mStream->NextToken();
+			//token = mStream->NextToken();
 
 		}
 		ExpressionElement ele;
@@ -324,7 +324,12 @@ ZScriptNode* ZParseExpression::Parse() {
 			lb.mOp = ExprOperatorType::OpLeftBrace;
 			expr.mElements.push_back(lb);
 			break;
+		case TokenType::TokenRightArray:
+			exp_node->SetExpression(expr);
+			return exp_node;
+			break;
 		case TokenType::TokenRightPara:
+		
 
 			if (mStream->PeekToken(0).mType == TokenType::TokenEndOfLine || mStream->PeekToken(0).mType == TokenType::TokenComma)
 			{
