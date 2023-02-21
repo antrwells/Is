@@ -8,6 +8,7 @@
 class ZContextScope;
 class ZSystemFunctions;
 class ZEnumNode;
+class ZTransientNode;
 
 class ZScriptContext
 {
@@ -44,7 +45,9 @@ public:
 		return mScope.top();
 	}
 	ZContextVar* RunLine(std::string code);
-
+	void AddTransient(ZTransientNode* node);
+	std::vector<ZTransientNode*> GetTransients();
+	ZTransientNode* GetTransient(std::string name);
 	void LoadLib(std::string name);
 	ZSystemFunctions* GetSysFuncs();
 private:
@@ -54,6 +57,7 @@ private:
 	std::vector<ZClassNode*> mStaticClasses;
 	std::stack<ZClassNode*> mClassStack;
 	std::vector<ZClassNode*> mInstances;
+	std::vector<ZTransientNode*> mTransients;
 	std::stack<ZContextScope*> mScope;
 	std::vector<ZEnumNode*> mEnums;
 	static bool mSysInit;

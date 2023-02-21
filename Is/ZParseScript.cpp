@@ -4,6 +4,7 @@
 #include "ZParseEnum.h"
 #include "ZEnumNode.h"
 #include "ZClassNode.h"
+#include "ZParseTransient.h"
 //#include
 
 
@@ -60,21 +61,32 @@ ZScriptNode* ZParseScript::Parse()
 			break;
 		case TokenType::TokenClass:
 
-
+		{
 			auto parse_class = new ZParseClass(mStream);
 
 			int line_start = mStream->PeekToken(0).TokenLineIndex;
-			
-			auto class_node = (ZClassNode*) parse_class->Parse();
+
+			auto class_node = (ZClassNode*)parse_class->Parse();
 
 			class_node->SetLineStart(line_start);
 
 			main_node->AddClass(class_node);
-			
-			int aa = 5;
-			
-			break;
 
+			int aa = 5;
+		}
+			break;
+		case TokenType::TokenTransient:
+		{
+			auto parse_trans = new ZParseTransient(mStream);
+			int line_start = mStream->PeekToken(0).TokenLineIndex;
+
+			auto trans_node = parse_trans->Parse();
+
+			main_node->AddTransient((ZTransientNode*)trans_node);
+
+		}
+
+			break;
 		}
 
 		//int aa = 5;

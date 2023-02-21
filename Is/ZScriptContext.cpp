@@ -12,6 +12,7 @@
 #include "DirCollection.h"
 #include "ZParser.h"
 #include <time.h>
+#include "ZTransientNode.h"
 #include "ZEnumNode.h"
 #include <ctime>
 
@@ -134,6 +135,11 @@ void ZScriptContext::AddNode(ZMainNode* node) {
 
 	}
 
+	for (int i = 0; i < node->GetTransients().size(); i++) {
+
+		mTransients.push_back(node->GetTransients()[i]);
+
+	}
 }
 
 ZClassNode* ZScriptContext::FindClass(std::string name) {
@@ -346,6 +352,30 @@ ZClassNode* ZScriptContext::GetStaticClass(std::string name) {
 		if (mStaticClasses[i]->GetName() == name)
 		{
 			return mStaticClasses[i];
+		}
+
+	}
+	return nullptr;
+
+}
+
+void ZScriptContext::AddTransient(ZTransientNode* node) {
+	mTransients.push_back(node);
+}
+
+std::vector<ZTransientNode*> ZScriptContext::GetTransients() {
+
+	return mTransients;
+
+}
+
+ZTransientNode* ZScriptContext::GetTransient(std::string name) {
+
+	for (int i = 0; i < mTransients.size(); i++) {
+
+		if (mTransients[i]->GetName() == name)
+		{
+			return mTransients[i];
 		}
 
 	}

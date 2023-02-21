@@ -21,6 +21,8 @@
 #include "ZParseForEach.h"
 #include "ZForEachNode.h";
 #include "ParseListAdd.h"
+#include "ZParseStartTransient.h"
+#include "ZStartTransientNode.h"
 ZParseCodeBody::ZParseCodeBody(ZTokenStream* stream) : ZParseNode(stream) {
 
 
@@ -38,6 +40,9 @@ CodeType ZParseCodeBody::PredictType() {
 		auto token = mStream->PeekToken(peek_val);
 
 		switch (token.mType) {
+		case TokenType::TokenStartTransient:
+			return CodeType::CodeStartTransient;
+			break;
 		case TokenType::TokenLeftArray:
 			return CodeType::CodeAssign;
 		case TokenType::TokenReturn:
@@ -282,6 +287,13 @@ ZScriptNode* ZParseCodeBody::Parse() {
 		int e = 0;
 
 		switch (code_type) {
+		case CodeType::CodeStartTransient:
+		{
+			auto parse_start = new ZParseStartTransient(mStream);
+			auto start_node = parse_start->Parse();
+			codebody->AddNode(start_node);
+		}
+			break;
 		case CodeType::CodeInc:
 
 		{

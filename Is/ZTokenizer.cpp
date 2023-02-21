@@ -339,8 +339,12 @@ ZTokenStream* ZTokenizer::Tokenize() {
 	token_map.insert(std::make_pair("enum", TokenType::TokenEnum));
 	token_map.insert(std::make_pair("expr", TokenType::TokenExpr));
 	token_map.insert(std::make_pair("mem", TokenType::TokenMem));
-
+	token_map.insert(std::make_pair("transient", TokenType::TokenTransient));
+	token_map.insert(std::make_pair("starttransient", TokenType::TokenStartTransient));
+	token_map.insert(std::make_pair("stoptransient", TokenType::TokenStopTransient));
 	std::vector<Token> new_tokens;
+
+
 
 	for (int i = 0; i < tokens.size(); i++) {
 

@@ -51,3 +51,9 @@ void ZMainNode::AddEnum(ZEnumNode* node) {
 	mEnums.push_back(node);
 
 }
+
+void ZMainNode::AddTransient(ZTransientNode* node) {
+
+	mTransients.push_back(node);
+
+}

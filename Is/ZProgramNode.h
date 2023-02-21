@@ -5,6 +5,7 @@
 
 class ZClassNode;
 class ZEnumNode;
+class ZTransientNode;
 
 class ZMainNode : ZScriptNode
 {
@@ -21,11 +22,16 @@ public:
 	std::vector<ZEnumNode*> GetEnums() {
 		return mEnums;
 	}
+	void AddTransient(ZTransientNode* node);
+	std::vector<ZTransientNode*> GetTransients() {
+		return mTransients;
+	}
 
 private:
 
 	std::vector<ZClassNode*> mClasses;
 	std::vector<ZClassNode*> mStaticClasses;
+	std::vector<ZTransientNode*> mTransients;
 	std::vector<ZEnumNode*> mEnums;
 
 };

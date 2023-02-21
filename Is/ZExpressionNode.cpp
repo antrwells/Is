@@ -224,48 +224,50 @@ int evaluateInt(std::vector<ExpressionElement> mElements) {
             else if (tok.mType == EVar)
             {
                 int depth = 0;
-                auto var = GetVar(mElements[0].mNameHash[0], mElements[0].mNameHash[1]);
-                switch (var->GetType()) {
-                case VarType::VarExpr:
-                    values.push((int)var->GetExpr()->Exec({})->GetIntVal());
-                    break;
-                case VarType::VarFloat:
-                    if (var->GetArray()) {
-                        auto ip = tok.mAccess->Exec({})->GetIntVal();
-                        float* f = (float*)var->GetMem(ip * sizeof(float));
-                        values.push((int)f[0]);
-                    }
-                    else {
-                        values.push((int)var->GetFloatVal());
-                    }
-                    break;
-                case VarType::VarInteger:
-                    
-                    if (var->GetArray()) {
-                        auto ip = tok.mAccess->Exec({})->GetIntVal();
-                        int* f = (int*)var->GetMem(ip * sizeof(int));
-                        values.push(f[0]);
-                        
-                    }
-                    else {
-                        values.push(var->GetIntVal());
-                    }
-                    break;
-                case VarType::VarBool:
-                    values.push(var->GetIntVal());
-                    break;
-                case VarType::VarVar:
+                auto var = GetVar(tok.mNameHash[0], tok.mNameHash[1]);
+                if (var != nullptr) {
+                    switch (var->GetType()) {
+                    case VarType::VarExpr:
+                        values.push((int)var->GetExpr()->Exec({})->GetIntVal());
+                        break;
+                    case VarType::VarFloat:
+                        if (var->GetArray()) {
+                            auto ip = tok.mAccess->Exec({})->GetIntVal();
+                            float* f = (float*)var->GetMem(ip * sizeof(float));
+                            values.push((int)f[0]);
+                        }
+                        else {
+                            values.push((int)var->GetFloatVal());
+                        }
+                        break;
+                    case VarType::VarInteger:
 
-                    switch (var->GetCurrentType()) {
-                    case VarInteger:
+                        if (var->GetArray()) {
+                            auto ip = tok.mAccess->Exec({})->GetIntVal();
+                            int* f = (int*)var->GetMem(ip * sizeof(int));
+                            values.push(f[0]);
+
+                        }
+                        else {
+                            values.push(var->GetIntVal());
+                        }
+                        break;
+                    case VarType::VarBool:
                         values.push(var->GetIntVal());
                         break;
-                    case VarFloat:
-                        values.push((int)var->GetFloatVal());
+                    case VarType::VarVar:
+
+                        switch (var->GetCurrentType()) {
+                        case VarInteger:
+                            values.push(var->GetIntVal());
+                            break;
+                        case VarFloat:
+                            values.push((int)var->GetFloatVal());
+                            break;
+                        }
+
                         break;
                     }
-
-                    break;
                 }
 
 

@@ -205,7 +205,9 @@
     <ClInclude Include="ZParseScript.h" />
     <ClInclude Include="ZParseSignature.h" />
     <ClInclude Include="ZParseSigParam.h" />
+    <ClInclude Include="ZParseStartTransient.h" />
     <ClInclude Include="ZParseStatement.h" />
+    <ClInclude Include="ZParseTransient.h" />
     <ClInclude Include="ZParseValue.h" />
     <ClInclude Include="ZParseVars.h" />
     <ClInclude Include="ZParseWhile.h" />
@@ -216,11 +218,13 @@
     <ClInclude Include="ZSignatureNode.h" />
     <ClInclude Include="ZSigParamNode.h" />
     <ClInclude Include="ZSource.h" />
+    <ClInclude Include="ZStartTransientNode.h" />
     <ClInclude Include="ZStatementNode.h" />
     <ClInclude Include="ZSystemFunction.h" />
     <ClInclude Include="ZSystemFunctions.h" />
     <ClInclude Include="ZTokenizer.h" />
     <ClInclude Include="ZTokenStream.h" />
+    <ClInclude Include="ZTransientNode.h" />
     <ClInclude Include="ZVarsNode.h" />
     <ClInclude Include="ZWhileNode.h" />
   </ItemGroup>
@@ -270,7 +274,9 @@
     <ClCompile Include="ZParseScript.cpp" />
     <ClCompile Include="ZParseSignature.cpp" />
     <ClCompile Include="ZParseSigParam.cpp" />
+    <ClCompile Include="ZParseStartTransient.cpp" />
     <ClCompile Include="ZParseStatement.cpp" />
+    <ClCompile Include="ZParseTransient.cpp" />
     <ClCompile Include="ZParseValue.cpp" />
     <ClCompile Include="ZParseVars.cpp" />
     <ClCompile Include="ZParseWhile.cpp" />
@@ -281,11 +287,13 @@
     <ClCompile Include="ZSignatureNode.cpp" />
     <ClCompile Include="ZSigParamNode.cpp" />
     <ClCompile Include="ZSource.cpp" />
+    <ClCompile Include="ZStartTransientNode.cpp" />
     <ClCompile Include="ZStatementNode.cpp" />
     <ClCompile Include="ZSystemFunction.cpp" />
     <ClCompile Include="ZSystemFunctions.cpp" />
     <ClCompile Include="ZTokenizer.cpp" />
     <ClCompile Include="ZTokenStream.cpp" />
+    <ClCompile Include="ZTransientNode.cpp" />
     <ClCompile Include="ZVarsNode.cpp" />
     <ClCompile Include="ZWhileNode.cpp" />
   </ItemGroup>

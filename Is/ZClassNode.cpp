@@ -235,6 +235,9 @@ ZContextVar* ZClassNode::CallMethod(size_t hash, const std::vector<ZContextVar*>
 		ZContextVar* v1 = new ZContextVar(pa->GetName(), pa->GetType(), pa->GetName(), false);
 		switch (params[i]->GetType())
 		{
+		case VarBool:
+			v1->SetBool(params[i]->GetBoolVal());
+			break;
 		case VarInteger:
 			v1->SetInt(params[i]->GetIntVal());
 			break;
